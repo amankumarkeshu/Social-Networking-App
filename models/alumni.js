@@ -7,7 +7,8 @@ var alumniSchema = new mongoose.Schema({
     name: String,
     author: {
         id: {
-            type: mongoose.Schema.Types.ObjectId  
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Post"
         },
         username: String,
         name: String
@@ -23,6 +24,7 @@ var alumniSchema = new mongoose.Schema({
     country: String,
     mobile: String,
     email: String
+
 });
 alumniSchema.plugin(passportLocalMongoose);
 

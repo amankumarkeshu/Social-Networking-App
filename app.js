@@ -311,13 +311,23 @@ app.get("/alumni/:id", function(req, res) {
 //EDIT ROUTES
 //=======================================================
 app.get("/alumni/:id/edit", checkAuthorization, function(req, res) {
-
     Alumni.findById(req.params.id, function(err, foundalumni) {
         if (err) {
             console.log(err);
-
         } else {
             res.render("alumni/edit", { alumni: foundalumni });
+        }
+    });
+
+});
+
+app.get("/posts/:id/edit", checkPostAuthorization, function(req, res) {
+
+    Posts.findById(req.params.id, function(err, foundPost) {
+        if (err) {
+            console.log(err);
+        } else {
+            res.render("alumni/editPost", { post: foundPost });
         }
     });
 
@@ -334,6 +344,19 @@ app.put("/alumni/:id", checkAuthorization, function(req, res) {
             res.redirect("/alumni");
         } else {
             res.redirect("/alumni/" + req.params.id);
+        }
+    });
+});
+
+app.put("/posts/:id", checkPostAuthorization, function(req, res) {
+    console.log(req.params.id);
+    console.log(req.body.post);
+    Posts.findByIdAndUpdate(req.params.id, req.body.post, function(err, updatedPost) {
+        if (err) {
+            res.redirect("/alumni");
+        } else {
+
+            res.redirect("/posts/" + req.params.id);
         }
     });
 });
@@ -355,12 +378,26 @@ app.delete("/alumni/:id", checkAuthorization, function(req, res) {
     });
 });
 
+app.delete("/posts/:id", checkPostAuthorization, function(req, res) {
+    Posts.findByIdAndRemove(req.params.id, function(err, newalumni) {
+        if (err) {
+            res.redirect("/alumni");
+
+        } else {
+            res.redirect("/alumni");
+        }
+    });
+});
+
 function checkAuthorization(req, res, next) {
     if (req.isAuthenticated()) {
         Alumni.findById(req.params.id, function(err, foundalumni) {
             if (err) {
                 res.redirect("back");
             } else {
+                console.log("Authorization:"+req.user._id +" "+ req.user.name);
+                console.log(foundalumni);
+                // next();
                 if (foundalumni._id.equals(req.user._id)) {
                     next();
                 } else {
@@ -373,6 +410,29 @@ function checkAuthorization(req, res, next) {
         res.redirect("back");
     }
 }
+
+function checkPostAuthorization(req, res, next) {
+    if (req.isAuthenticated()) {
+        Posts.findById(req.params.id, function(err, foundPost) {
+            if (err) {
+                res.redirect("back");
+            } else {
+                console.log("Authorization Post:"+req.user._id +" "+ req.user.name);
+                console.log(foundPost.name+" "+ foundPost.author.username);
+                // next();
+                if (foundPost.author.id.equals(req.user._id)) {
+                    next();
+                } else {
+                    res.redirect("back");
+                }
+            }
+        });
+
+    } else {
+        res.redirect("back");
+    }
+}
+
 
 //======================================================
 //AUTH ROUTES
@@ -399,7 +459,6 @@ app.post("/register", function(req, res) {
 });
 
 //LOGIN routes
-
 app.get("/login", function(req, res) {
     res.render("login");
 
