@@ -73,7 +73,18 @@ app.get("/alumni", function(req, res) {
 //SEARCH Alumni
 //////////////////////////////
 app.get("/alumni/search", function(req, res) {
-    res.render("search.ejs");
+    Alumni.find({}, function(err, alumni) {
+        if (err) {
+            console.log("OOPS there's an error");
+        } else {
+            alumni.forEach(function(alumni_) {
+              
+            });
+            res.render("search.ejs", { alumni: alumni });
+        }
+
+    });
+    // res.render("search.ejs", { alumni: alumni });
 });
 
 app.post("/search", function(req, res) {
@@ -87,13 +98,6 @@ app.post("/search", function(req, res) {
     } else {
         query = { name: { $exists: true } };
     }
-
-    // if (req.body.college) {
-    //     query2 = req.body.college;
-    // } else {
-    //     query2 = { college: { $exists: true } };
-    // }
-
 
     Alumni.find({ name: query}, function(err, alumni) {
         if (err) {

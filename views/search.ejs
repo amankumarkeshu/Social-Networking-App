@@ -3,23 +3,41 @@
     <div class="container">
         <div class="row">
             <h1 style="text-align: center;">FIND FRIENDS</h1>
+
+           
+
             <div style="width: 30%; margin: 30px auto;">
                 <form action="/search" method="POST">
                     <div class="form-group">
                         <input class="form-control" type="text" name="name" placeholder="name">
                     </div>
-
-                    <!-- <div class="form-group">
-                        <input class="form-control" type="text" name="college" placeholder="college">
-                    </div> -->
-
-
+    
                     <div class="form-group">
                         <button class="btn btn-lg btn-primary btn-block">Submit!</button>
                     </div>
-
-
                 </form>
+            </div>
+                <div class="row text-center" style="display:flex; flex-wrap: wrap;">
+                    <% alumni.forEach(function(alumni){ %>
+                        <div class="col-md-3 col-sm-6">
+                            <div class="thumbnail" style="height: 350px;">
+                                <img class="padding" src="<%= alumni.image %>" style=" padding-top: 27%;padding-bottom: 20%; padding-left: 10%;padding-right: 10%;">
+                                <div class="caption" style=" position: absolute;bottom: 80px;left: 70px;">
+                                 <h4>
+                                     <%= alumni.name %>
+                                </h4>
+                            </div>
+        
+                             <p>
+                                <a href="/alumni/<%= alumni._id%>" class="btn btn-primary" style=" position: absolute;bottom: 50px;left: 100px;">View Profile</a>
+                             </p>
+                        </div>
+                    </div>
+                 <% }); %>
+
+
+            
+             
                 <a href="/alumni">Go Back</a>
             </div>
 
