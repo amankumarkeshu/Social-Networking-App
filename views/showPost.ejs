@@ -1,0 +1,33 @@
+<% include partials/header %>
+
+        <div class="container">
+            <div class="row">
+                <div class="col-md-5 thrift-show">
+                     <div class="thumbnail" style="width: 100%;">
+                        <img style="width: 100%;" class="image-responsive" src="<%= post.image %>">
+                        <div class="caption-full">
+
+                         <h4>
+                            <a>
+                                 <%=post.name%>
+                            </a>
+                             <%=post.description%>
+                          
+                        </h4>
+                       
+                            <p>
+                                <em>Submitted By: <%= ( post.author.username) %></em>
+                             </p>
+
+                            <% if(currentUser && post._id && post.author.username == currentUser.username){ %>
+                                <a class="btn btn-xs btn-warning" href="/posts/<%= post._id %>/edit">Edit</a>
+                                 <form id="delete" action="/posts/<%= post._id %>?_method=DELETE" method="POST">
+                                       <button class="btn btn-xs btn-danger">Delete</button>
+                                 </form>
+                            <% } %>
+                         </div>
+                       </div>
+                </div>
+            </div>
+        </div>
+     <% include partials/footer %>

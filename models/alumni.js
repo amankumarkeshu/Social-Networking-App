@@ -1,11 +1,13 @@
 var mongoose = require("mongoose");
+var passportLocalMongoose = require("passport-local-mongoose");
 
 var alumniSchema = new mongoose.Schema({
+    username: String,
+    password: String,
     name: String,
     author: {
         id: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User"
+            type: mongoose.Schema.Types.ObjectId  
         },
         username: String,
         name: String
@@ -22,6 +24,6 @@ var alumniSchema = new mongoose.Schema({
     mobile: String,
     email: String
 });
-
+alumniSchema.plugin(passportLocalMongoose);
 
 module.exports = mongoose.model("Alumni", alumniSchema);

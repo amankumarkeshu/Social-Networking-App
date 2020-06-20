@@ -6,20 +6,20 @@
         <header class="jumbotron">
             <div class="container">
                 <center>
-                    <h1>Welcome to ALUMNIS Directory</h1>
+                    <h1>Welcome to THE SOCIAL NETWORKING</h1>
                 </center>
 
                 <center>
-                    <h2> View our alumnis from all over the world! </h2>
+                    <h2> View our Posts from all over the world! </h2>
                 </center>
                 <p></p>
 
                 <p>
-                    <a class="btn btn-primary btn-large" href="/alumni/new">CREATE ACCOUNT</a>
+                    <a class="btn btn-primary btn-large" href="/posts/new">What's On Your Mind!!</a>
                 </p>
 
                 <p>
-                    <a class="btn btn-primary btn-large" href="/alumni/search">Search ALUMNI</a>
+                    <a class="btn btn-primary btn-large" href="/alumni/search">Search Friends</a>
                 </p>
 
             </div>
@@ -40,29 +40,19 @@
 
 
         <div class="row text-center" style="display:flex; flex-wrap: wrap;">
-            <% alumni.forEach(function(alumni){ %>
+            <% posts.forEach(function(post){ %>
                 <div class="col-md-3 col-sm-6">
                     <div class="thumbnail" style="height: 350px;">
+                         <img class="padding" src="<%= post.image %>" style=" padding-top: 27%;padding-bottom: 20%; padding-left: 10%;padding-right: 10%;">
+                         <div class="caption" style=" position: absolute;bottom: 80px;left: 70px;">
+                          <h4>
+                              <%= post.name %>
+                           </h4>
+                    </div>
 
-                        <% if( alumni.name != "Kaustabh karkare" && alumni.name != "Aman Kumar1" ){ %>
-
-                            <img class="padding" src="<%= alumni.image %>" style=" padding-top: 15%;padding-bottom: 20%; padding-left: 10%;padding-right: 10%;">
-                            <!-- width: 80%; -->
-                            <% } else{ %>
-                                <img class="padding" src="<%= alumni.image %>" style=" padding-top: 27%;padding-bottom: 20%; padding-left: 10%;padding-right: 10%;">
-                                <% } %>
-
-
-
-                                    <div class="caption" style=" position: absolute;bottom: 80px;left: 70px;">
-                                        <h4>
-                                            <%= alumni.name %>
-                                        </h4>
-                                    </div>
-
-                                    <p>
-                                        <a href="/alumni/<%= alumni._id%>" class="btn btn-primary" style=" position: absolute;bottom: 50px;left: 100px;">More Info</a>
-                                    </p>
+                        <p>
+                        <a href="/posts/<%= post._id%>" class="btn btn-primary" style=" position: absolute;bottom: 50px;left: 100px;">More Info</a>
+                        </p>
                     </div>
                 </div>
                 <% }); %>

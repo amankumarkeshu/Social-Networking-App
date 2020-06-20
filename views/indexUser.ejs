@@ -1,0 +1,52 @@
+<% include partials/header %>
+    <div class="container">
+
+        <header class="jumbotron">
+            <div class="container">
+                <center>
+                    <h1>Welcome to THE SOCIAL NETWORKING</h1>
+                </center>
+                <center>
+                    <h2> View our Users from all over the world! </h2>
+                </center>
+                <p></p>
+                <p>
+                    <a class="btn btn-primary btn-large" href="/posts/new">What's On Your Mind!!</a>
+                </p>
+                <p>
+                    <a class="btn btn-primary btn-large" href="/alumni/search">Search Friends</a>
+                </p>
+
+            </div>
+        </header>
+
+        <div class="row text-center" style="display:flex; flex-wrap: wrap;">
+            <% alumni.forEach(function(alumni){ %>
+                <div class="col-md-3 col-sm-6">
+                    <div class="thumbnail" style="height: 350px;">
+                        <img class="padding" src="<%= alumni.image %>" style=" padding-top: 27%;padding-bottom: 20%; padding-left: 10%;padding-right: 10%;">
+                        <div class="caption" style=" position: absolute;bottom: 80px;left: 70px;">
+                         <h4>
+                             <%= alumni.name %>
+                        </h4>
+                    </div>
+
+                     <p>
+                        <a href="/alumni/<%= alumni._id%>" class="btn btn-primary" style=" position: absolute;bottom: 50px;left: 100px;">View Profile</a>
+                     </p>
+                </div>
+            </div>
+         <% }); %>
+     </div>
+</div>
+
+    <div id="particles-js">
+        </br>
+        </br>
+        </br>
+        <div id="abc">
+        </div>
+        <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+        <script src="/js/script.js"></script>
+
+        <% include partials/footer %></input>

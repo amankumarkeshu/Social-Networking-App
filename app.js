@@ -5,7 +5,7 @@ var express = require("express"),
     methodOverride = require("method-override"),
     LocalStrategy = require("passport-local"),
     passport = require("passport"),
-    User = require("./models/user"),
+    Posts = require("./models/posts"),
     Alumni = require("./models/alumni"),
     request = require('request'),
     nodemailer = require('nodemailer'),
@@ -15,7 +15,7 @@ var client = new twilio(config.twilio.accountSid, config.twilio.authToken);
 
 
 
-mongoose.connect("mongodb://localhost:27017/alumni_connects_v2", { useUnifiedTopology: true, useNewUrlParser: true }); //create alumni db inside mongodb
+mongoose.connect("mongodb://localhost:27017/SocialNetworkingConnect", { useUnifiedTopology: true, useNewUrlParser: true }); //create Posts and users inside mongodb
 
 app.use(bodyParser.urlencoded({
     extended: true
@@ -40,9 +40,9 @@ app.use(passport.session());
 app.use(passport.initialize());
 app.use(passport.session());
 
-passport.use(new LocalStrategy(User.authenticate()));
-passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.deserializeUser());
+passport.use(new LocalStrategy(Alumni.authenticate()));
+passport.serializeUser(Alumni.serializeUser());
+passport.deserializeUser(Alumni.deserializeUser());
 
 app.use(function(req, res, next) {
     res.locals.currentUser = req.user;
@@ -52,25 +52,17 @@ app.use(function(req, res, next) {
 
 app.get("/", function(req, res) {
     res.render("landing");
-
-
 });
 
-// Alumni.remove({}, function(err) {
-//     if (err) {
-//         console.log(err);
-//     }
-// });
-
-//INDEX ROUTE - show all alumnis
+//INDEX ROUTE - show all Posts
 app.get("/alumni", function(req, res) {
-    // Get all alumnis from DB
-    Alumni.find({}, function(err, allalumni) {
+    // Get all Posts from DB
+    Posts.find({}, function(err, allPosts) {
         if (err) {
             console.log(err);
         } else {
             res.render("index", {
-                alumni: allalumni
+                posts: allPosts
             }); //data + name passing in
         }
     });
@@ -87,10 +79,8 @@ app.get("/alumni/search", function(req, res) {
 app.post("/search", function(req, res) {
 
     var alumni = req.body;
-
-
     var query, query2;
-    var name, batch;
+    var name, batch,college;
 
     if (req.body.name) {
         query = req.body.name;
@@ -98,46 +88,25 @@ app.post("/search", function(req, res) {
         query = { name: { $exists: true } };
     }
 
-    if (req.body.batch) {
-        query2 = req.body.batch;
-    } else {
-        query2 = { batch: { $exists: true } };
-    }
-    var college = req.body.college;
+    // if (req.body.college) {
+    //     query2 = req.body.college;
+    // } else {
+    //     query2 = { college: { $exists: true } };
+    // }
 
-    //console.log(college + " HEheh");
-    // res.send("HI MAN THIS IS SEARCH");
 
-    Alumni.find({ name: query, batch: query2, college: college }, function(err, alumni) {
-
+    Alumni.find({ name: query}, function(err, alumni) {
         if (err) {
             console.log("OOPS there's an error");
 
         } else {
-
             alumni.forEach(function(alumni_) {
-                // console.log(alumni_.name + " HAHA");
+              
             });
-
-            res.render("index.ejs", { alumni: alumni });
+            res.render("indexUser.ejs", { alumni: alumni });
         }
 
     });
-
-
-
-    // Alumni.find({ title: { $regex: new RegExp(title1) } }, function(err, blog) {
-    // if (err) {
-    //     console.log("OOPS there's an error");
-
-    // } else {
-    //     res.render("index.ejs", { blog: blog });
-    // }
-    // });
-
-    //  db.products.find( { sku: { $regex: /789$/ } } )
-
-
 });
 
 //======================================================
@@ -159,8 +128,6 @@ app.get("/alumni/:id/email", function(req, res) {
 
     // res.render("email.ejs", { alumni: alumni });
 });
-
-
 
 app.post("/alumni/:id/email", function(req, res) {
     //res.render("email.ejs");
@@ -223,19 +190,8 @@ app.get("/alumni/:id/message", function(req, res) {
 
 });
 app.post("/alumni/:id/message", function(req, res) {
-
-
     var sender = '+12562428531';
-
     var message = req.body.text;
-    // Details about Visitor $ { name }
-    // Name: $ { name }
-    // Email: $ { email }
-    // Phone: $ { number }
-    // Checkin Time: $ { currtime }
-    // Visiting ID: $ { id }
-    // `;
-
     Alumni.findById(req.params.id, function(err, foundalumni) {
         if (err) {
             console.log(err);
@@ -253,103 +209,104 @@ app.post("/alumni/:id/message", function(req, res) {
                 .catch((error) => {
                     console.log(error);
                 });
-
         }
     })
 
 });
-//CREATE - add new alumni to database
-app.post("/alumni", isLoggedIn, function(req, res) {
+//CREATE - add new Post to database
+app.post("/posts", isLoggedIn, function(req, res) {
     //get data from form and add to thriftstore array
+    // request('https://maps.googleapis.com/maps/api/geocode/json?key=AIzaSyAPzLdcKEPCe4SQf3-cdSnq5vmh_MRaHCs' +
 
-    request('https://maps.googleapis.com/maps/api/geocode/json?key=AIzaSyAPzLdcKEPCe4SQf3-cdSnq5vmh_MRaHCs' +
+    //     '&address=' + encodeURIComponent(req.body.address),
+    //     function(error, response, body) {
+    //         if (error) {
+    //             console.log('error!', error);
+    //         } else {
+    //             var data = JSON.parse(body);
+    //             // console.log('data: ', util.inspect(data, { showHidden: false, depth: null }))
 
-        '&address=' + encodeURIComponent(req.body.address),
-        function(error, response, body) {
-            if (error) {
-                console.log('error!', error);
-            } else {
-                var data = JSON.parse(body);
-                // console.log('data: ', util.inspect(data, { showHidden: false, depth: null }))
+    //             if (data.results && data.results[0] && ["address_components"]) {
+    //                 var addressComponents = data.results[0]["address_components"]
+    //                 for (var i = 0; i < addressComponents.length; i++) {
+    //                     if (
+    //                         addressComponents[i]['types'].indexOf('sublocality_level_1') > -1 ||
+    //                         addressComponents[i]['types'].indexOf('locality') > -1) {
+    //                         var city = addressComponents[i]['long_name'];
+    //                     }
+    //                     if (addressComponents[i]['types'].indexOf('administrative_area_level_1') > -1) {
+    //                         var state = addressComponents[i]['short_name'];
+    //                     }
+    //                     if (addressComponents[i]['types'].indexOf('country') > -1) {
+    //                         var country = addressComponents[i]['long_name'];
+    //                     }
+    //                 }
+    //             } else {
+    //                 var city = null,
+    //                     state = null,
+    //                     country = null;
+    //             }
 
-                if (data.results && data.results[0] && ["address_components"]) {
-                    var addressComponents = data.results[0]["address_components"]
-                    for (var i = 0; i < addressComponents.length; i++) {
-                        if (
-                            addressComponents[i]['types'].indexOf('sublocality_level_1') > -1 ||
-                            addressComponents[i]['types'].indexOf('locality') > -1) {
-                            var city = addressComponents[i]['long_name'];
-                        }
-                        if (addressComponents[i]['types'].indexOf('administrative_area_level_1') > -1) {
-                            var state = addressComponents[i]['short_name'];
-                        }
-                        if (addressComponents[i]['types'].indexOf('country') > -1) {
-                            var country = addressComponents[i]['long_name'];
-                        }
-                    }
-                } else {
-                    var city = null,
-                        state = null,
-                        country = null;
-                }
-
-                var newalumni = {
+                var newPost = {
                     name: req.body.name,
                     image: req.body.image,
-                    branch: req.body.branch,
-                    batch: req.body.batch,
-                    address: req.body.address,
-                    college: req.body.college,
-                    city: city,
-                    state: state,
-                    country: country,
-                    mobile: req.body.mobile,
-                    email: req.body.email,
-
+                    description:req.body.description,
                     author: {
                         id: req.user._id,
                         username: req.user.username,
                         name: req.user.name
                     }
                 };
-
-
-                Alumni.create(newalumni, function(err, newlyCreated) {
+                console.log(newPost);
+                console.log(" \n");
+                Posts.create(newPost, function(err, newlyCreated) {
                     if (err) {
                         console.log(err);
                     } else {
-                        console.log(newlyCreated);
                         res.redirect("/alumni");
                     }
                 });
-            }
+            // }
 
-        });
+        // });
 
 });
 
 
-
-//NEW - show form to create new campground 
-app.get("/alumni/new", isLoggedIn, function(req, res) {
-    res.render("new.ejs")
+//NEW - show form to create new Blog Post 
+app.get("/posts/new", isLoggedIn, function(req, res) {
+    res.render("new.ejs");
 });
 
 //SHOW - shows more info about campground selected - to be declared after NEW to not overwrite
-app.get("/alumni/:id", function(req, res) {
+app.get("/posts/:id", function(req, res) {
     //find the campground with the provided ID
-    Alumni.findById(req.params.id, function(err, foundalumni) {
+    Posts.findById(req.params.id, function(err, foundpost) {
         if (err) {
             console.log(err);
         } else {
             //render show template with that campground
-            res.render("show", {
-                alumni: foundalumni
+            res.render("showPost", {
+                post: foundpost
             });
         }
     });
 });
 
+//SHOW - shows more info about campground selected - to be declared after NEW to not overwrite
+app.get("/alumni/:id", function(req, res) {
+    //find the campground with the provided ID
+    Alumni.findById(req.params.id, function(err, foundUser) {
+        if (err) {
+            console.log(err);
+        } else {
+            //render show template with that campground
+            res.render("show", {
+                alumni: foundUser
+            });
+        }
+    });
+});
 //======================================================
 //EDIT ROUTES
 //=======================================================
@@ -403,11 +360,8 @@ function checkAuthorization(req, res, next) {
         Alumni.findById(req.params.id, function(err, foundalumni) {
             if (err) {
                 res.redirect("back");
-
             } else {
-
-
-                if (foundalumni.author.id.equals(req.user._id)) {
+                if (foundalumni._id.equals(req.user._id)) {
                     next();
                 } else {
                     res.redirect("back");
@@ -431,23 +385,17 @@ app.get("/register", function(req, res) {
 
 //Handle user sign up
 app.post("/register", function(req, res) {
-
-    var newuser = new User({ username: req.body.username });
-
-    User.register(newuser, req.body.password, function(err, user) {
+    var newuser = new Alumni({ name:req.body.name ,username: req.body.username });
+    
+    Alumni.register(newuser, req.body.password, function(err, user) {
         if (err) {
             console.log(err);
             return res.render("register");
-
         }
         passport.authenticate("local")(req, res, function() {
             res.redirect("/alumni");
-
         });
-
     });
-
-
 });
 
 //LOGIN routes
@@ -482,5 +430,5 @@ function isLoggedIn(req, res, next) {
 }
 
 app.listen(3000, function() {
-    console.log(" Jai shree ram Alumni server has started!");
+    console.log(" Jai shree ram !! Social Networking server has started!");
 });
