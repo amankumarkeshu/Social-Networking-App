@@ -28,9 +28,13 @@
                              <p>
                                  <%= alumni.batch %>
                             </p>
-                            <p>
-                                <em>Submitted By: <%= (alumni.name ||  alumni.username) %></em>
-                             </p>
+                            <% if(currentUser && !alumni._id.equals(currentUser._id)){ %>
+                            <form id="friendrequest" action="/alumni/<%= alumni._id %>?_method=PUT" method="POST">
+                                <button class="btn btn-xs btn-success">ADD FRIEND</button>
+                          </form>
+                          <% } %>
+
+
                             <% if(currentUser && alumni._id && alumni._id.equals(currentUser._id)){ %>
                                 <a class="btn btn-xs btn-warning" href="/alumni/<%= alumni._id %>/edit">Edit</a>
                                  <form id="delete" action="/alumni/<%= alumni._id %>?_method=DELETE" method="POST">

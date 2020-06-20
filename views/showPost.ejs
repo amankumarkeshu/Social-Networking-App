@@ -11,18 +11,27 @@
                             <a>
                                  <%=post.name%>
                             </a>
+                            <p>
+
                              <%=post.description%>
-                          
+                            </p>
                         </h4>
                             <p>
                                 <em>Submitted By: <%= ( post.author.username) %></em>
                              </p>
+                             <form id="comment" action="/posts/<%= post._id %>?_method=PUT" method="POST">
+                                <input type="text" name="comment" > 
+                                <button class="btn btn-xs btn-success">Comment</button>
+                             </form>
 
-                            <% if(currentUser && post._id && post.author.username == currentUser.username){ %>
+                            <% if(currentUser && post._id && post.author.id == currentUser.id){ %>
                                 <a class="btn btn-xs btn-warning" href="/posts/<%= post._id %>/edit">Edit</a>
                                  <form id="delete" action="/posts/<%= post._id %>?_method=DELETE" method="POST">
                                        <button class="btn btn-xs btn-danger">Delete</button>
                                  </form>
+
+                                
+
                             <% } %>
                          </div>
                        </div>
