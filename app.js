@@ -7,6 +7,7 @@ var express = require("express"),
     passport = require("passport"),
     Posts = require("./models/posts"),
     Alumni = require("./models/alumni"),
+    Comments = require("./models/comments"),
     request = require('request'),
     nodemailer = require('nodemailer'),
     twilio = require('twilio');
@@ -285,16 +286,18 @@ app.get("/posts/new", isLoggedIn, function(req, res) {
 //SHOW - shows more info about campground selected - to be declared after NEW to not overwrite
 app.get("/posts/:id", function(req, res) {
     //find the campground with the provided ID
-    Posts.findById(req.params.id, function(err, foundpost) {
+
+    Posts.findById(req.params.id).populate("comments").exec(function(err, post) {
         if (err) {
             console.log(err);
         } else {
             //render show template with that campground
             res.render("showPost", {
-                post: foundpost
+                post: post
             });
         }
     });
+    
 });
 
 //SHOW - shows more info about campground selected - to be declared after NEW to not overwrite
@@ -375,48 +378,23 @@ app.get("/posts/:id/edit", checkPostAuthorization, function(req, res) {
 // Show Friends
 app.get("/alumni/friends/:id",function(req,res){
     let friend=[];
-    //     const friendAlumni= Alumni.findById(req.params.id,function(err,found){
-    //         if(err)
-    //         {
-    //         console.log(err);
-    //         }
-    //         else{
-    //     // console.log(" My FOUND " + found.friends);
-    //         found.friends.forEach(function(f){
-    //         Alumni.findById(f,function(err,f1){
-    //             console.log(" Hi: " + f1.name);
-    //             friend.push(f1);
-    //             // console.log(" HI friends: " + friend+"\n");
-    //         });
-    //         });
-    //         } 
-    // }).then((onfulfilled)=>{
-    // console.log(" My friends: " + friend);
 
-    // res.render("showFriends",{friends:friend});
-    // });
     var friendSize=0;
-   
-
     const promise1 = new Promise((resolve, reject) => {
-
         Alumni.findById(req.params.id,function(err,found){
             if(err)
             {
                 console.log(err);
             }
             else{
-       
             friendSize= found.friends.length;
-
             found.friends.forEach(function(f){
             Alumni.findById(f,function(err,f1){
                 console.log(" Hi: " + f1.name);
                 friend.push(f1);
                 if( friend.length == friendSize){
                     resolve(friend.length ===friendSize);
-                }
-                 
+                }   
             });
           
             });
@@ -426,16 +404,12 @@ app.get("/alumni/friends/:id",function(req,res){
             console.log(friend.length, friendSize);
             } 
          });
-       
-
         });
       promise1.then((val) => {
         console.log(val);
         console.log(" My friends: " + friend);
         res.render("showFriends",{friends:friend});
-      
-       
-        // expected output: "Success!"
+
       });
 
   });
@@ -468,7 +442,84 @@ app.put("/posts/:id", checkPostAuthorization, function(req, res) {
 });
 
 
+//======================================================
+//comment ROUTES
+//=======================================================
 
+
+app.get("/posts/:id/comments/new", isLoggedIn, function(req, res) {
+    Posts.findById(req.params.id, function(err, newPost) {
+        if (err) {
+            console.log(err);
+        } else {
+            res.render("comments/newComment", { post: newPost });
+        }
+    });
+
+});
+
+app.post("/posts/:id/comments", isLoggedIn, function(req, res) {
+    console.log(req.params.id);
+    Posts.findById(req.params.id, function(err, newPost) {
+        if (err) {
+            console.log(err);
+            //res.redirect("/campegrounds/:id");
+        } else {
+            Comments.create(req.body.comment, function(err, comment) {
+                if (err) {
+                    //req.flash("error","Something Went Wrong");
+                    console.log(err);
+                } else {
+                    //console.log(req.user);
+                    comment.author.id = req.user._id;
+                    comment.author.username = req.user.username;
+                    comment.save();
+                    newPost.comments.push(comment);
+                    newPost.save();
+                    //req.flash("Success","Comment Added");
+                    res.redirect("/posts/" + req.params.id);
+                }
+
+            });
+        }
+
+    });
+});
+
+app.get("/posts/:id/comments/:comment_id/edit", checkComment, function(req, res) {
+    Comments.findById(req.params.comment_id, function(err, newCom) {
+        if (err) {
+            console.log(err);
+            //res.redirect("back");
+        } else {
+
+            res.render("comments/editComment", { post_id: req.params.id, comment: newCom });
+        }
+    });
+});
+
+app.put("/posts/:id/comments/:comment_id", checkComment, function(req, res) {
+    Comments.findByIdAndUpdate(req.params.comment_id, req.body.comment, function(err, updCom) {
+        if (err) {
+            //res.redirect("back");
+        } else {
+            console.log(req.params.id);
+            console.log(req.params.comment_id);
+            res.redirect("/posts/" + req.params.id);
+        }
+    });
+});
+
+app.delete("/posts/:id/comments/:comment_id", checkComment, function(req, res) {
+    Comments.findByIdAndRemove(req.params.comment_id, function(err, updCom) {
+        if (err) {
+            //res.redirect("back");
+        } else {
+            //req.flash("success","Comment Deleted Successfully");
+            res.redirect("/posts/" + req.params.id);
+        }
+    });
+});
 
 //======================================================
 //DESTROY ROUTE
@@ -538,6 +589,26 @@ function checkPostAuthorization(req, res, next) {
     }
 }
 
+function checkComment(req, res, next) {
+    if (req.isAuthenticated()) {
+        Comments.findById(req.params.comment_id, function(err, newCom) {
+            if (err) {
+                // req.flash("error","Comment not found!");
+                // res.redirect("back");
+            } else {
+                if (newCom.author.id.equals(req.user._id)) {
+                    next();
+                } else {
+                    // req.flash("error","Access Denied");
+                    // res.redirect("back");
+                }
+            }
+        });
+    } else {
+        // req.flash("error","Login Required!");
+        // res.redirect("back");
+    }
+}
 
 //======================================================
 //AUTH ROUTES

@@ -4,7 +4,7 @@ const alumni = require("./alumni");
 var postSchema = new mongoose.Schema({
     name: String,
     image: String,
-    description:String,
+    description: String,
     author: {
         id: {
             type: mongoose.Schema.Types.ObjectId,
@@ -12,7 +12,11 @@ var postSchema = new mongoose.Schema({
         },
         username: String,
         name: String
-    }
+    },
+    comments: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Comments"
+    }]
 });
- 
+
 module.exports = mongoose.model("Posts", postSchema);

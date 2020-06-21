@@ -19,10 +19,7 @@
                              <p>
                                 <em> Submitted By: <a class="btn btn-xs " href="/alumni/<%=post.author.id %>" ><%= ( post.author.name) %></a> </em>
                               </p>
-                             <form id="comment" action="/posts/<%= post._id %>?_method=PUT" method="POST">
-                                <input type="text" name="comment" > 
-                                <button class="btn btn-xs btn-success">Comment</button>
-                             </form>
+                             
 
                             <% if(currentUser && post._id && post.author.id == currentUser.id){ %>
                                 <a class="btn btn-xs btn-warning" href="/posts/<%= post._id %>/edit">Edit</a>
@@ -31,9 +28,41 @@
                                  </form>
 
                             <% } %>
+
+                            <form action="/posts/<%= post._id %>/comments" method="POST">
+                                <div class="form-group">
+                                    <input  type="text" name="comment[text]" placeholder="text">
+                                 
+                                    <button  class="btn btn-xs btn-success">Submit!</button>
+                                </div>
+                            </form>
                          </div>
                        </div>
                 </div>
+
+
+                <div class="well">
+                 
+                  <hr>
+                  <% post.comments.forEach(function(comment){ %>
+                      <div class="row">
+                          <div class="col-md-12">
+                              <strong><%= comment.author.username %></strong>
+                              <span class="pull-right">10 days ago</span>
+                              <p>
+                                  <%= comment.text %>
+                              </p>
+                              <% if(currentUser && comment.author.id.equals(currentUser._id)){%>
+                                  <a class="btn btn-xs btn-warning" href="/posts/<%= post._id%>/comments/<%= comment._id%>/edit">Edit</a>
+                                  <form id="delForm" action="/posts/<%= post._id%>/comments/<%= comment._id%>?_method=DELETE" method="POST">
+                                      <button class="btn btn-xs btn-danger">Delete</button>
+                                  </form>
+                                  <%}%>
+                          </div>
+                          <div>
+                              <% })%>
+                          </div>
+
             </div>
         </div>
      <% include partials/footer %>
