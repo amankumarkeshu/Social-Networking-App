@@ -372,6 +372,74 @@ app.get("/posts/:id/edit", checkPostAuthorization, function(req, res) {
 });
 
 
+// Show Friends
+app.get("/alumni/friends/:id",function(req,res){
+    let friend=[];
+    //     const friendAlumni= Alumni.findById(req.params.id,function(err,found){
+    //         if(err)
+    //         {
+    //         console.log(err);
+    //         }
+    //         else{
+    //     // console.log(" My FOUND " + found.friends);
+    //         found.friends.forEach(function(f){
+    //         Alumni.findById(f,function(err,f1){
+    //             console.log(" Hi: " + f1.name);
+    //             friend.push(f1);
+    //             // console.log(" HI friends: " + friend+"\n");
+    //         });
+    //         });
+    //         } 
+    // }).then((onfulfilled)=>{
+    // console.log(" My friends: " + friend);
+
+    // res.render("showFriends",{friends:friend});
+    // });
+    var friendSize=0;
+   
+
+    const promise1 = new Promise((resolve, reject) => {
+
+        Alumni.findById(req.params.id,function(err,found){
+            if(err)
+            {
+                console.log(err);
+            }
+            else{
+       
+            friendSize= found.friends.length;
+
+            found.friends.forEach(function(f){
+            Alumni.findById(f,function(err,f1){
+                console.log(" Hi: " + f1.name);
+                friend.push(f1);
+                if( friend.length == friendSize){
+                    resolve(friend.length ===friendSize);
+                }
+                 
+            });
+          
+            });
+            if( friend.length == friendSize){
+                resolve(friend.length ==friendSize);
+            }
+            console.log(friend.length, friendSize);
+            } 
+         });
+       
+
+        });
+      promise1.then((val) => {
+        console.log(val);
+        console.log(" My friends: " + friend);
+        res.render("showFriends",{friends:friend});
+      
+       
+        // expected output: "Success!"
+      });
+
+  });
+
 
 //======================================================
 //UPDATE ROUTES
