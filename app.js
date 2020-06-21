@@ -299,6 +299,22 @@ app.get("/posts/:id", function(req, res) {
 
 //SHOW - shows more info about campground selected - to be declared after NEW to not overwrite
 app.get("/alumni/:id", function(req, res) {
+
+    var posts=[];
+   
+    Posts.find({},function(err,found){
+        if(err)
+            console.log(err);
+        else{
+            found.forEach(function(f){
+                if(f.author.id.equals(req.params.id))
+                   { console.log(f);
+                posts.push(f);}
+            })
+           
+        }
+    });
+
     //find the campground with the provided ID
     Alumni.findById(req.params.id, function(err, foundUser) {
         if (err) {
@@ -306,7 +322,8 @@ app.get("/alumni/:id", function(req, res) {
         } else {
             //render show template with that campground
             res.render("show", {
-                alumni: foundUser
+                alumni: foundUser,
+                posts:posts
             });
         }
     });
@@ -322,8 +339,26 @@ app.get("/alumni/:id/edit", checkAuthorization, function(req, res) {
             res.render("alumni/edit", { alumni: foundalumni });
         }
     });
-
 });
+
+// Add new Friend
+app.put("/alumni/newfriend/:id/my/:id1",function(req,res){
+    console.log(req.params.id+"\n"+req.params.id1);
+    Alumni.findById(req.params.id1,function(err,found){
+        if(err)
+        {console.log(err);
+          res.redirect("/alumni/"+req.params.id1);}
+        else{
+        console.log(found);
+        if(  found && !found.friends.includes(req.params.id)){
+            found.friends.push(req.params.id);
+            found.save();
+        }
+            res.redirect("/alumni/"+req.params.id);}
+    })
+})
+
+// Add new Friend
 
 app.get("/posts/:id/edit", checkPostAuthorization, function(req, res) {
 
@@ -334,7 +369,6 @@ app.get("/posts/:id/edit", checkPostAuthorization, function(req, res) {
             res.render("alumni/editPost", { post: foundPost });
         }
     });
-
 });
 
 
@@ -421,8 +455,7 @@ function checkPostAuthorization(req, res, next) {
             if (err) {
                 res.redirect("back");
             } else {
-                console.log("Authorization Post:"+req.user._id +" "+ req.user.name);
-                console.log(foundPost.name+" "+ foundPost.author.username);
+
                 // next();
                 if (foundPost.author.id.equals(req.user._id)) {
                     next();

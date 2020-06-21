@@ -28,11 +28,13 @@
                              <p>
                                  <%= alumni.batch %>
                             </p>
-                            <% if(currentUser && !alumni._id.equals(currentUser._id)){ %>
-                            <form id="friendrequest" action="/alumni/<%= alumni._id %>?_method=PUT" method="POST">
-                                <button class="btn btn-xs btn-success">ADD FRIEND</button>
-                          </form>
-                          <% } %>
+
+                            <% if ( currentUser && !currentUser.friends.includes(alumni._id)){ %>
+                            <% if(currentUser && alumni._id && !alumni._id.equals(currentUser._id)){ %>
+                                <form id="put"  action="/alumni/newfriend/<%= alumni._id %>/my/<%=currentUser._id %>?_method=PUT" method="POST">
+                                    <button class="btn btn-xs btn-success">Add friend</button>
+                                    </form>
+                            <% } }%>
 
 
                             <% if(currentUser && alumni._id && alumni._id.equals(currentUser._id)){ %>
@@ -41,6 +43,9 @@
                                        <button class="btn btn-xs btn-danger">Delete</button>
                                  </form>
                             <% } %>
+
+                          
+
                          </div>
                        </div>
                 </div>
@@ -66,10 +71,33 @@
                         <li class="list-group-item  ">
                             <a href="/alumni/<%=alumni._id%>/message">  Send Message</a>
                         </li>
+                        <li class="list-group-item  ">
+                            <a  href="/alumni/<%=alumni._id%>/friends">  friends</a>
+                        </li>
 
                     </div>
                 </div>
 
             </div>
         </div>
+
+        <div class="row text-center" style="display:flex; flex-wrap: wrap;">
+            <% posts.forEach(function(post){ %>
+                <div class="col-md-3 col-sm-6">
+                    <div class="thumbnail" style="height: 350px;">
+                         <img class="padding" src="<%= post.image %>" style=" padding-top: 27%;padding-bottom: 20%; padding-left: 10%;padding-right: 10%;">
+                         <div class="caption" style=" position: absolute;bottom: 80px;left: 70px;">
+                          <h4>
+                              <%= post.name %>
+                           </h4>
+                    </div>
+
+                        <p>
+                        <a href="/posts/<%= post._id%>" class="btn btn-primary" style=" position: absolute;bottom: 50px;left: 100px;">More Info</a>
+                        </p>
+                    </div>
+                </div>
+                <% }); %>
+        </div>
+    </div>
      <% include partials/footer %>
