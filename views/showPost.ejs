@@ -6,7 +6,6 @@
                      <div class="thumbnail" style="width: 100%;">
                         <img style="width: 100%;" class="image-responsive" src="<%= post.image %>">
                         <div class="caption-full">
-
                          <h4>
                             <a>
                                  <%=post.name%>
@@ -41,7 +40,7 @@
                 </div>
 
 
-                <div class="well">
+                <!-- <div class="well">
                  
                   <hr>
                   <% post.comments.forEach(function(comment){ %>
@@ -61,7 +60,54 @@
                           </div>
                           <div>
                               <% })%>
-                          </div>
+                    </div> -->
+                    <div class="well">
+                        <!-- <div class="text-right">
+                            <p><a href="/posts/<%= post._id %>/comments/new" class="btn btn-success">Add New Comment</a></p>
+                        </div>
+                        <hr> -->
+                        <% post.comments.forEach(function(comment){ %>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <strong><%= comment.author.username %></strong>
+                                    <span class="pull-right">10 days ago</span>
+                                    <p>
+                                        <%= comment.text %>
+                                    </p>
+                                    <% if(currentUser && comment.author.id.equals(currentUser._id)){%>
+                                        <form id="editForm" action="/posts/<%= post._id %>/comments/<%= comment._id %>?_method=PUT" method="POST" style="display: none;">
+                                            <div class="form-group">
+                                                <input class="form-control" type="text" name="comment[text]" value="<%= comment.text %>">
+                                            </div>
+                                            <div class="form-group">
+                                                <button class="btn btn-lg btn-primary btn-block" onclick="myFunction1()">Update!</button>
+                                            </div>
+                                        </form>
+                                        <button id="editButton" class="btn btn-xs btn-warning" onclick="myFunction()">Edit</button>
+                                        <form id="delForm" action="/posts/<%= post._id%>/comments/<%= comment._id%>?_method=DELETE" method="POST">
+                                            <button class="btn btn-xs btn-danger">Delete</button>
+                                        </form>
+                                        <%}%>
+                                </div>
+                                <div>
+                                    <% })%>
+                                </div>
+    
+                            </div>
+                    </div>
+                </div>
+                <script>
+                    function myFunction() {
+                        document.getElementById("editForm").style.display = "block";
+                        document.getElementById("editButton").style.display = "none";
+                    }
+    
+                    function myFunction1() {
+                        document.getElementById("editForm").style.display = "none";
+                        document.getElementById("editButton").style.display = "block";
+                    }
+                </script>
+                <% include partials/footer %>
 
             </div>
         </div>

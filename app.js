@@ -13,10 +13,8 @@ var express = require("express"),
     twilio = require('twilio');
 var config = require('./config/config.js');
 var client = new twilio(config.twilio.accountSid, config.twilio.authToken);
-
-
-
-mongoose.connect("mongodb://localhost:27017/SocialNetworkingConnect", { useUnifiedTopology: true, useNewUrlParser: true }); //create Posts and users inside mongodb
+var mongoUrl=config.uri.uri;
+mongoose.connect(mongoUrl, { useUnifiedTopology: true, useNewUrlParser: true }); //create Posts and users inside mongodb
 
 app.use(bodyParser.urlencoded({
     extended: true
