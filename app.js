@@ -13,7 +13,7 @@ var express = require("express"),
     twilio = require('twilio');
 var config = require('./config/config.js');
 var client = new twilio(config.twilio.accountSid, config.twilio.authToken);
-var mongoUrl=config.uri.uri;
+var mongoUrl=config.url.url;
 mongoose.connect(mongoUrl, { useUnifiedTopology: true, useNewUrlParser: true }); //create Posts and users inside mongodb
 
 app.use(bodyParser.urlencoded({
