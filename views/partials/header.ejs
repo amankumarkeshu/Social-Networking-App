@@ -13,31 +13,31 @@
     <nav class="navbar navbar-default">
         <div class="container-fluid">
             <div class="navbar-header">
-                  <a class="navbar-brand" href="/">SOCIAL NETWORKING CONNECT</a>
+                <a class="navbar-brand" href="/">SOCIAL NETWORKING CONNECT</a>
             </div>
             <div class="collapse navbar-collapse">
                 <div class="navbar-header">
-                    
-                        <a class="navbar-brand" href="/alumni/">HOME</a>  
-                      
-                     
+
+                    <a class="navbar-brand" href="/alumni/">HOME</a>
+
+
                 </div>
                 <p>
                     <a class="btn btn-primary btn-sm" href="/alumni/search">Search Friends</a>
                 </p>
                 <ul class="nav navbar-nav navbar-right">
-                <%  if(!currentUser) {  %>
-                    <li> <a href='/login'>Login</a></li>
-                    <li> <a href='/register'>Sign Up</a></li>
-                <% } else{ %>
+                    <%  if(!currentUser) {  %>
+                        <li> <a href='/'>Login</a></li>
+                        <li> <a href='/'>Sign Up</a></li>
+                        <% } else{ %>
 
-                    <li> <a href="/alumni/<%= currentUser._id%>">  Signed in as: <%= currentUser.username %> </a>
-                         <li> <a class="btn btn-xs btn-warning" href="/alumni/<%= currentUser._id%>"> MY PROFILE %> </a>
-                    </li>
+                            <li> <a href="/alumni/<%= currentUser._id%>">  Signed in as: <%= currentUser.username %> </a>
+                                <li> <a class="btn btn-xs btn-warning" href="/alumni/<%= currentUser._id%>"> MY PROFILE %> </a>
+                                </li>
 
-                    <li> <a href='/logout'>Logout</a></li>
-                <%  } %>
-            </ul>
+                                <li> <a href='/logout'>Logout</a></li>
+                                <%  } %>
+                </ul>
+            </div>
         </div>
-     </div>
- </nav>
+    </nav>

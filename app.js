@@ -624,7 +624,7 @@ app.post("/register", function(req, res) {
     Alumni.register(newuser, req.body.password, function(err, user) {
         if (err) {
             console.log(err);
-            return res.render("register");
+            return res.render("landing");
         }
         passport.authenticate("local")(req, res, function() {
             res.redirect("/alumni");
@@ -641,7 +641,7 @@ app.get("/login", function(req, res) {
 //HAndle login page
 app.post("/login", passport.authenticate("local", {
     successRedirect: "/alumni",
-    failureRedirect: "/login"
+    failureRedirect: "/"
 
 }), function(req, res) {
 
