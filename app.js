@@ -13,9 +13,9 @@ var express = require("express"),
     twilio = require('twilio');
 var config = require('./config/config.js');
 var client = new twilio(config.twilio.accountSid, config.twilio.authToken);
-var mongoUrl=config.url.url;
-mongoose.connect(mongoUrl, { useUnifiedTopology: true, useNewUrlParser: true }); //create Posts and users inside mongodb
-
+// var mongoUrl=config.url.url;
+// mongoose.connect(mongoUrl, { useUnifiedTopology: true, useNewUrlParser: true }); //create Posts and users inside mongodb
+mongoose.connect("mongodb://localhost:27017/SocialNetworkingConnect", { useUnifiedTopology: true, useNewUrlParser: true });
 app.use(bodyParser.urlencoded({
     extended: true
 }));
@@ -77,7 +77,7 @@ app.get("/alumni/search", function(req, res) {
             console.log("OOPS there's an error");
         } else {
             alumni.forEach(function(alumni_) {
-              
+
             });
             res.render("search.ejs", { alumni: alumni });
         }
@@ -90,7 +90,7 @@ app.post("/search", function(req, res) {
 
     var alumni = req.body;
     var query, query2;
-    var name, batch,college;
+    var name, batch, college;
 
     if (req.body.name) {
         query = req.body.name;
@@ -98,13 +98,13 @@ app.post("/search", function(req, res) {
         query = { name: { $exists: true } };
     }
 
-    Alumni.find({ name: query}, function(err, alumni) {
+    Alumni.find({ name: query }, function(err, alumni) {
         if (err) {
             console.log("OOPS there's an error");
 
         } else {
             alumni.forEach(function(alumni_) {
-              
+
             });
             res.render("indexUser.ejs", { alumni: alumni });
         }
@@ -250,28 +250,28 @@ app.post("/posts", isLoggedIn, function(req, res) {
     //                     country = null;
     //             }
 
-                var newPost = {
-                    name: req.body.name,
-                    image: req.body.image,
-                    description:req.body.description,
-                    author: {
-                        id: req.user._id,
-                        username: req.user.username,
-                        name: req.user.name
-                    }
-                };
-                console.log(newPost);
-                console.log(" \n");
-                Posts.create(newPost, function(err, newlyCreated) {
-                    if (err) {
-                        console.log(err);
-                    } else {
-                        res.redirect("/alumni");
-                    }
-                });
-            // }
+    var newPost = {
+        name: req.body.name,
+        image: req.body.image,
+        description: req.body.description,
+        author: {
+            id: req.user._id,
+            username: req.user.username,
+            name: req.user.name
+        }
+    };
+    console.log(newPost);
+    console.log(" \n");
+    Posts.create(newPost, function(err, newlyCreated) {
+        if (err) {
+            console.log(err);
+        } else {
+            res.redirect("/alumni");
+        }
+    });
+    // }
 
-        // });
+    // });
 
 });
 
@@ -295,24 +295,25 @@ app.get("/posts/:id", function(req, res) {
             });
         }
     });
-    
+
 });
 
 //SHOW - shows more info about campground selected - to be declared after NEW to not overwrite
 app.get("/alumni/:id", function(req, res) {
 
-    var posts=[];
-   
-    Posts.find({},function(err,found){
-        if(err)
+    var posts = [];
+
+    Posts.find({}, function(err, found) {
+        if (err)
             console.log(err);
-        else{
-            found.forEach(function(f){
-                if(f.author.id.equals(req.params.id))
-                   { console.log(f);
-                posts.push(f);}
+        else {
+            found.forEach(function(f) {
+                if (f.author.id.equals(req.params.id)) {
+                    console.log(f);
+                    posts.push(f);
+                }
             })
-           
+
         }
     });
 
@@ -324,7 +325,7 @@ app.get("/alumni/:id", function(req, res) {
             //render show template with that campground
             res.render("show", {
                 alumni: foundUser,
-                posts:posts
+                posts: posts
             });
         }
     });
@@ -343,19 +344,20 @@ app.get("/alumni/:id/edit", checkAuthorization, function(req, res) {
 });
 
 // Add new Friend
-app.put("/alumni/newfriend/:id/my/:id1",function(req,res){
-    console.log(req.params.id+"\n"+req.params.id1);
-    Alumni.findById(req.params.id1,function(err,found){
-        if(err)
-        {console.log(err);
-          res.redirect("/alumni/"+req.params.id1);}
-        else{
-        console.log(found);
-        if(  found && !found.friends.includes(req.params.id)){
-            found.friends.push(req.params.id);
-            found.save();
+app.put("/alumni/newfriend/:id/my/:id1", function(req, res) {
+    console.log(req.params.id + "\n" + req.params.id1);
+    Alumni.findById(req.params.id1, function(err, found) {
+        if (err) {
+            console.log(err);
+            res.redirect("/alumni/" + req.params.id1);
+        } else {
+            console.log(found);
+            if (found && !found.friends.includes(req.params.id)) {
+                found.friends.push(req.params.id);
+                found.save();
+            }
+            res.redirect("/alumni/" + req.params.id);
         }
-            res.redirect("/alumni/"+req.params.id);}
     })
 })
 
@@ -374,43 +376,41 @@ app.get("/posts/:id/edit", checkPostAuthorization, function(req, res) {
 
 
 // Show Friends
-app.get("/alumni/friends/:id",function(req,res){
-    let friend=[];
+app.get("/alumni/friends/:id", function(req, res) {
+    let friend = [];
 
-    var friendSize=0;
+    var friendSize = 0;
     const promise1 = new Promise((resolve, reject) => {
-        Alumni.findById(req.params.id,function(err,found){
-            if(err)
-            {
+        Alumni.findById(req.params.id, function(err, found) {
+            if (err) {
                 console.log(err);
+            } else {
+                friendSize = found.friends.length;
+                found.friends.forEach(function(f) {
+                    Alumni.findById(f, function(err, f1) {
+                        console.log(" Hi: " + f1.name);
+                        friend.push(f1);
+                        if (friend.length == friendSize) {
+                            resolve(friend.length === friendSize);
+                        }
+                    });
+
+                });
+                if (friend.length == friendSize) {
+                    resolve(friend.length == friendSize);
+                }
+                console.log(friend.length, friendSize);
             }
-            else{
-            friendSize= found.friends.length;
-            found.friends.forEach(function(f){
-            Alumni.findById(f,function(err,f1){
-                console.log(" Hi: " + f1.name);
-                friend.push(f1);
-                if( friend.length == friendSize){
-                    resolve(friend.length ===friendSize);
-                }   
-            });
-          
-            });
-            if( friend.length == friendSize){
-                resolve(friend.length ==friendSize);
-            }
-            console.log(friend.length, friendSize);
-            } 
-         });
         });
-      promise1.then((val) => {
+    });
+    promise1.then((val) => {
         console.log(val);
         console.log(" My friends: " + friend);
-        res.render("showFriends",{friends:friend});
+        res.render("showFriends", { friends: friend });
 
-      });
+    });
 
-  });
+});
 
 
 //======================================================
@@ -550,7 +550,7 @@ function checkAuthorization(req, res, next) {
             if (err) {
                 res.redirect("back");
             } else {
-                console.log("Authorization:"+req.user._id +" "+ req.user.name);
+                console.log("Authorization:" + req.user._id + " " + req.user.name);
                 console.log(foundalumni);
                 // next();
                 if (foundalumni._id.equals(req.user._id)) {
@@ -619,8 +619,8 @@ app.get("/register", function(req, res) {
 
 //Handle user sign up
 app.post("/register", function(req, res) {
-    var newuser = new Alumni({ name:req.body.name ,username: req.body.username });
-    
+    var newuser = new Alumni({ name: req.body.name, username: req.body.username });
+
     Alumni.register(newuser, req.body.password, function(err, user) {
         if (err) {
             console.log(err);

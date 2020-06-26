@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>SOCIAL NETWORKING CONNECT</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
     <link rel="stylesheet" href="/stylesheet/landing.css">
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js" type="text/javascript" async></script>
     <audio class="myAudio">
         <source src="gamingmusic.mp3" type="audio/mp3">
@@ -18,27 +20,83 @@
             x.play();
         }
     </script>
+    <%  if(currentUser) {  %>
+        <div>
+
+        </div>
+        <a class="play-btn" onclick="playAudio()" href="#"></a>
+
+        <div id="landing-header">
+            <h1 class="display-1">
+            </h1>
+            <h1> Welcome to the SOCIAL NETWORKING APP!</h1>
+            <a class="btn btn-lg btn-success" onclick="playAudio()" href="/alumni">View POSTS</a>
+            <!-- <a onclick="playAudio()" class=" btn btn-lg btn-success " href="/alumni">View All Alumnis</a> -->
+        </div>
+        <% } else{ %>
+
+            <div class="container" id="container">
+                <!-- <h1> Welcome to the SOCIAL NETWORKING APP!</h1> -->
+                <div class="form-container sign-up-container">
+
+                    <form action="register" method="POST">
+                        <h1>Create Account</h1>
+                        <input type="text" name="name" placeholder="Name">
+                        <input type="text" name="username" placeholder="Username">
+                        <input type="password" name="password" placeholder="password">
+                        <button> Sign Up</button>
+
+                    </form>
+                </div>
+                <div class="form-container sign-in-container">
 
 
-    <a class="play-btn" onclick="playAudio()" href="#"></a>
+                    <form action="login" method="POST">
+                        <h1>Sign in</h1>
+                        <input type="text" name="username" placeholder=" username">
+                        <input type="password" name="password" placeholder="password">
+                        <a href="#">Forgot your password?</a>
+                        <button> Sign In</button>
 
-    <div class="container">
+                    </form>
 
-    </div>
 
-    <div id="landing-header">
-        <h1 class="display-1">
-            </h1class> Welcome to the SOCIAL NETWORKING APP!</h1>
-        <a class="btn btn-lg btn-success" onclick="playAudio()" href="/alumni">View POSTS</a>
-        <!-- // <a onclick="playAudio()" class=" btn btn-lg btn-success " href="/alumni">View All Alumnis</a> -->
-    </div>
+                </div>
+                <div class="overlay-container">
+                    <div class="overlay">
+                        <div class="overlay-panel overlay-left">
+                            <h1>Welcome Back!</h1>
+                            <p>To keep connected with us please login with your personal info</p>
+                            <button class="ghost" id="signIn">Sign In</button>
+                        </div>
+                        <div class="overlay-panel overlay-right">
+                            <h1>Hello, Friend!</h1>
+                            <p>Enter your personal details and start journey with us</p>
+                            <button class="ghost" id="signUp">Sign Up</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-    <ul class="slideshow ">
-        <li></li>
-        <li></li>
-        <li></li>
-        <li></li>
-        <li></li>
-    </ul>
 
-    <% include partials/footer %>
+            <script>
+                const signUpButton = document.getElementById('signUp');
+                const signInButton = document.getElementById('signIn');
+                const container = document.getElementById('container');
+
+                signUpButton.addEventListener('click', () =>
+                    container.classList.add('right-panel-active'));
+
+                signInButton.addEventListener('click', () =>
+                    container.classList.remove('right-panel-active'));
+            </script>
+            <%  } %>
+                <ul class="slideshow ">
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                </ul>
+
+                <% include partials/footer %>
