@@ -13,91 +13,95 @@
 
         <% } %>
 
-        <div class="container">
-            <div class="row">
-                <div class="col-md-5 thrift-show">
-                     <div class="thumbnail" style="width: 100%;">
-                        <img style="width: 100%;" class="image-responsive" src="<%= alumni.image %>">
-                        <div class="caption-full">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-5 thrift-show">
+                        <div class="thumbnail" style="width: 100%;">
+                            <% if(alumni.image) {%>
+                                <img style="width: 100%;" class="image-responsive" src="<%= alumni.image %>">
+                                <% } else{%>
+                                    <img style="width: 100%;" class="image-responsive" src="https://www.kindpng.com/picc/m/252-2524695_dummy-profile-image-jpg-hd-png-download.png">
+                                    <% } %>
+                                        <div class="caption-full">
 
-                         <h4>
-                            <a>
-                                 <%=alumni.name%>
-                            </a>
-                        </h4>
-                             <p>
-                                 <%= alumni.batch %>
-                            </p>
+                                            <h4>
+                                                <a>
+                                                    <%=alumni.name%>
+                                                </a>
+                                            </h4>
+                                            <p>
+                                                <%= alumni.batch %>
+                                            </p>
 
-                            <% if ( currentUser && !currentUser.friends.includes(alumni._id)){ %>
-                            <% if(currentUser && alumni._id && !alumni._id.equals(currentUser._id)){ %>
-                                <form id="put"  action="/alumni/newfriend/<%= alumni._id %>/my/<%=currentUser._id %>?_method=PUT" method="POST">
-                                    <button class="btn btn-xs btn-success">Add friend</button>
-                                    </form>
-                            <% } }%>
+                                            <% if ( currentUser && !currentUser.friends.includes(alumni._id)){ %>
+                                                <% if(currentUser && alumni._id && !alumni._id.equals(currentUser._id)){ %>
+                                                    <form id="put" action="/alumni/newfriend/<%= alumni._id %>/my/<%=currentUser._id %>?_method=PUT" method="POST">
+                                                        <button class="btn btn-xs btn-success">Add friend</button>
+                                                    </form>
+                                                    <% } }%>
 
 
-                            <% if(currentUser && alumni._id && alumni._id.equals(currentUser._id)){ %>
-                                <a class="btn btn-xs btn-warning" href="/alumni/<%= alumni._id %>/edit">Edit</a>
-                                 <form id="delete" action="/alumni/<%= alumni._id %>?_method=DELETE" method="POST">
-                                       <button class="btn btn-xs btn-danger">Delete</button>
-                                 </form>
-                            <% } %>
+                                                        <% if(currentUser && alumni._id && alumni._id.equals(currentUser._id)){ %>
+                                                            <a class="btn btn-xs btn-warning" href="/alumni/<%= alumni._id %>/edit">Edit</a>
+                                                            <form id="delete" action="/alumni/<%= alumni._id %>?_method=DELETE" method="POST">
+                                                                <button class="btn btn-xs btn-danger">Delete</button>
+                                                            </form>
+                                                            <% } %>
 
-                          
 
-                         </div>
-                       </div>
-                </div>
 
-                 <div class="col-md-3">
-                    <p class="lead">MORE DETAILS</p>
-                    <div class="list-group">
-                        <li class="list-group-item ">
-                             <%=alumni.email%>
-                        </li>
-                        <li class="list-group-item">
-                             <%=alumni.mobile%>
-                         </li>
-
-                         <li class="list-group-item">
-                            <%=alumni.college%>
-                        </li>
-
-                         <li class="list-group-item  ">
-                            <a href="/alumni/<%=alumni._id%>/email">  Send Email</a>
-                        </li>
-
-                        <li class="list-group-item  ">
-                            <a href="/alumni/<%=alumni._id%>/message">  Send Message</a>
-                        </li>
-                        <li class="list-group-item  ">
-                            <a  href="/alumni/friends/<%=alumni._id%>">  friends</a>
-                        </li>
-
+                                        </div>
+                        </div>
                     </div>
-                </div>
 
+                    <div class="col-md-3">
+                        <p class="lead">MORE DETAILS</p>
+                        <div class="list-group">
+                            <li class="list-group-item ">
+                                <%=alumni.email%>
+                            </li>
+                            <li class="list-group-item">
+                                <%=alumni.mobile%>
+                            </li>
+
+                            <li class="list-group-item">
+                                <%=alumni.college%>
+                            </li>
+
+                            <li class="list-group-item  ">
+                                <a href="/alumni/<%=alumni._id%>/email">  Send Email</a>
+                            </li>
+
+                            <li class="list-group-item  ">
+                                <a href="/alumni/<%=alumni._id%>/message">  Send Message</a>
+                            </li>
+                            <li class="list-group-item  ">
+                                <a href="/alumni/friends/<%=alumni._id%>">  friends</a>
+                            </li>
+
+                        </div>
+                    </div>
+
+                </div>
             </div>
-        </div>
 
-        <div class="row text-center" style="display:flex; flex-wrap: wrap;">
-            <% posts.forEach(function(post){ %>
-                <div class="col-md-3 col-sm-6">
-                    <div class="thumbnail" style="height: 350px;">
-                         <img class="padding" src="<%= post.image %>" style=" padding-top: 27%;padding-bottom: 20%; padding-left: 10%;padding-right: 10%;">
-                         <div class="caption" style=" position: absolute;bottom: 80px;left: 70px;">
-                          <h4>
-                              <%= post.name %>
-                           </h4>
-                    </div>
+            <div class="row text-center" style="display:flex; flex-wrap: wrap;">
+                <% posts.forEach(function(post){ %>
+                    <div class="col-md-3 col-sm-6">
+                        <div class="thumbnail" style="height: 350px;">
+                            <img class="padding" src="<%= post.image %>" style=" padding-top: 27%;padding-bottom: 20%; padding-left: 10%;padding-right: 10%;">
+                            <div class="caption" style=" position: absolute;bottom: 80px;left: 70px;">
+                                <h4>
+                                    <%= post.name %>
+                                </h4>
+                            </div>
 
-                        <p>
-                        <a href="/posts/<%= post._id%>" class="btn btn-primary" style=" position: absolute;bottom: 50px;left: 100px;">More Info</a>
-                        </p>
+                            <p>
+                                <a href="/posts/<%= post._id%>" class="btn btn-primary" style=" position: absolute;bottom: 50px;left: 100px;">More Info</a>
+                            </p>
+                        </div>
                     </div>
-                </div>
-                <% }); %>
-        </div>
-    </div>
-     <% include partials/footer %>
+                    <% }); %>
+            </div>
+            </div>
+            <% include partials/footer %>

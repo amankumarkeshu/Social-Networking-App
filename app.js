@@ -612,10 +612,10 @@ function checkComment(req, res, next) {
 //AUTH ROUTES
 //=======================================================
 
-app.get("/register", function(req, res) {
-    res.render("register");
+// app.get("/register", function(req, res) {
+//     res.render("register");
 
-});
+// });
 
 //Handle user sign up
 app.post("/register", function(req, res) {
@@ -633,10 +633,10 @@ app.post("/register", function(req, res) {
 });
 
 //LOGIN routes
-app.get("/login", function(req, res) {
-    res.render("login");
+// app.get("/login", function(req, res) {
+//     res.render("login");
 
-});
+// });
 
 //HAndle login page
 app.post("/login", passport.authenticate("local", {
