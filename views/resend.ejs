@@ -1,0 +1,10 @@
+<% include ./partials/header %>
+    <h1>A verification email has been sent to
+        <%= email %> . </h1>
+    <h4> Token not received? </h4>
+    <form action="resend" method="POST">
+        <input type="text" name="email" placeholder="Email" value="<%= email %>" style="display: none;">
+        <button> Resend</button>
+    </form>
+
+    <% include ./partials/footer %>

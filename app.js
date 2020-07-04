@@ -8,10 +8,13 @@ var express = require("express"),
     Posts = require("./models/posts"),
     Alumni = require("./models/alumni"),
     Comments = require("./models/comments"),
+    Tokens = require("./models/token"),
     request = require('request'),
     nodemailer = require('nodemailer'),
-    twilio = require('twilio');
+    crypto = require('crypto');
+twilio = require('twilio');
 var config = require('./config/config.js');
+const { getMaxListeners } = require("./models/alumni");
 var client = new twilio(config.twilio.accountSid, config.twilio.authToken);
 // var mongoUrl=config.url.url;
 // mongoose.connect(mongoUrl, { useUnifiedTopology: true, useNewUrlParser: true }); //create Posts and users inside mongodb
@@ -619,16 +622,54 @@ function checkComment(req, res, next) {
 
 //Handle user sign up
 app.post("/register", function(req, res) {
-    var newuser = new Alumni({ name: req.body.name, username: req.body.username });
-
+    var newuser = new Alumni({ name: req.body.name, username: req.body.username, email: req.body.email });
+    //console.log("daaaaaa");
     Alumni.register(newuser, req.body.password, function(err, user) {
         if (err) {
             console.log(err);
             return res.render("landing");
         }
-        passport.authenticate("local")(req, res, function() {
-            res.redirect("/alumni");
+        //console.log("daaaaaa");
+        var token = new Tokens({ _userId: user._id, token: crypto.randomBytes(16).toString('hex') });
+        token.save(function(err) {
+            if (err) {
+                console.log(err);
+            }
+
+            var transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: config.mlab.username,
+                    pass: config.mlab.password
+                }
+            });
+            var mailOptions = {
+                from: "norplay@gmail.com",
+                to: user.email,
+                subject: 'Account Verification Token',
+                text: 'Hello,\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/confirmation\/' + token.token + '.\n'
+
+            };
+            // console.log(mailOptions);
+
+
+
+
+
+
+
+            //var transporter = nodemailer.createTransport({ service: 'Sendgrid', auth: { user: process.env.SENDGRID_USERNAME, pass: process.env.SENDGRID_PASSWORD } });
+            //var mailOptions = { from: 'no-reply@yourwebapplication.com', to: user.email, subject: 'Account Verification Token', text: 'Hello,\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/confirmation\/' + token.token + '.\n' };
+            transporter.sendMail(mailOptions, function(err) {
+                if (err) { console.log(err); }
+                // console.log("SuCCeSS");
+                res.render("resend", { email: user.email });
+                // res.status(200).send('A verification email has been sent to ' + user.email + '.');
+            });
         });
+        // passport.authenticate("local")(req, res, function() {
+        //res.redirect("/alumni");
+        // });
     });
 });
 
@@ -639,27 +680,105 @@ app.post("/register", function(req, res) {
 // });
 
 //HAndle login page
-app.post("/login", passport.authenticate("local", {
+app.post("/login", verified, passport.authenticate("local", {
     successRedirect: "/alumni",
     failureRedirect: "/"
 
-}), function(req, res) {
+}), function(req, res, ) {
 
 });
-
 //LOGOUT ROUTE
 app.get("/logout", function(req, res) {
     req.logout();
     res.redirect("/alumni");
 })
 
+// Email Verification
 
+function verified(req, res, next) {
+    console.log("daaa");
+    Alumni.findOne({ username: req.body.username }, function(err, alumni) {
+        if (alumni.isVerified) {
+            return next();
+        }
+        console.log("unverified");
+        res.redirect("/");
+    });
+}
+// app.get('/resend', function(req, res) {
+//     res.render("resend");
+// });
+app.post('/resend', function(req, res, next) {
+
+
+    Alumni.findOne({ email: req.body.email }, function(err, user) {
+        if (!user) return res.status(400).send({ msg: 'We were unable to find a user with that email.' });
+        if (user.isVerified) return res.status(400).send({ msg: 'This account has already been verified. Please log in.' });
+
+        // Create a verification token, save it, and send email
+        var token = new Tokens({ _userId: user._id, token: crypto.randomBytes(16).toString('hex') });
+
+        // Save the token
+        token.save(function(err) {
+            if (err) { return res.status(500).send({ msg: err.message }); }
+
+            var transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: config.mlab.username,
+                    pass: config.mlab.password
+                }
+            });
+            var mailOptions = {
+                from: "norplay@gmail.com",
+                to: user.email,
+                subject: 'Account Verification Token',
+                text: 'Hello,\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/confirmation\/' + token.token + '.\n'
+
+            };
+            console.log(mailOptions);
+            transporter.sendMail(mailOptions, function(err) {
+                if (err) { console.log(err); }
+                console.log("SuCCeSS");
+                res.render("resend", { email: user.email });
+                //res.status(200).send('A verification email has been sent to ' + user.email + '.');
+            });
+        });
+
+    });
+});
+app.get('/confirmation/:id', function(req, res) {
+    res.render("confirm", { token: req.params.id });
+});
+
+app.post('/confirmation', function(req, res) {
+
+    // Find a matching token
+    Tokens.findOne({ token: req.body.token }, function(err, token) {
+        if (!token) return res.status(400).send({ type: 'not-verified', msg: 'We were unable to find a valid token. Your token my have expired.' });
+
+        // If we found a token, find a matching user
+        Alumni.findOne({ _id: token._userId, email: req.body.email }, function(err, alumni) {
+            if (!alumni) return res.status(400).send({ msg: 'We were unable to find a user for this token.' });
+            if (alumni.isVerified) return res.status(400).send({ type: 'already-verified', msg: 'This user has already been verified.' });
+
+            // Verify and save the user
+            alumni.isVerified = true;
+            alumni.save(function(err) {
+                if (err) { return res.status(500).send({ msg: err.message }); }
+                console.log("The account has been verified. Please log in.");
+                res.redirect('/');
+                //res.status(200).send("The account has been verified. Please log in.");
+            });
+        });
+    });
+});
 //Is login check for adding comments
 function isLoggedIn(req, res, next) {
     if (req.isAuthenticated()) {
         return next();
     }
-    res.redirect("/login");
+    res.redirect("/");
 }
 
 app.listen(3000, function() {

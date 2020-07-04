@@ -23,8 +23,11 @@ var alumniSchema = new mongoose.Schema({
     phone: String,
     country: String,
     mobile: String,
-    email: String,
-    friends:[]
+    email: { type: String, unique: true },
+    passwordResetToken: String,
+    passwordResetExpires: Date,
+    isVerified: { type: Boolean, default: false },
+    friends: [],
 
 });
 alumniSchema.plugin(passportLocalMongoose);

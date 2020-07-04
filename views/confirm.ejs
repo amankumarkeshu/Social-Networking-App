@@ -1,0 +1,11 @@
+<% include ./partials/header %>
+
+    <h1> this is the login page</h1>
+
+    <form action="/confirmation" method="POST">
+        <input type="text" name="token" placeholder="token" value="<%= token %>" style="display: none;">
+        <input type="text" name="email" placeholder="email">
+        <button> Confirm</button>
+
+    </form>
+    <% include ./partials/footer %>
